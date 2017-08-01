@@ -6,29 +6,43 @@ import (
 	"os"
 
 	"github.com/a10y/classy/classfile"
+	"github.com/fatih/color"
+)
+
+var (
+	HeaderPrinter    *color.Color = color.New(color.FgYellow)
+	SuccessColorizer              = color.New(color.BgGreen, color.FgWhite)
+	ErrorColorizer                = color.New(color.FgWhite, color.BgRed)
 )
 
 func main() {
-	// Read all bytes in
 	data, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
 	classFile := classfile.ReadClassFile(data)
 
-	validMsg := "valid"
+	validMsg := SuccessColorizer.Sprint("valid")
 	if classFile.Magic != 0xCAFEBABE {
-		validMsg = "INVALID"
+		validMsg = ErrorColorizer.Sprintf("INVALID")
 	}
+
 	fmt.Printf("Magic: 0x%X (%v)\n", classFile.Magic, validMsg)
 	fmt.Printf("Major: %v\n", classFile.MajorVersion)
 	fmt.Printf("Minor: %v\n", classFile.MinorVersion)
-	fmt.Printf("\nConstantPool: (%v entries)\n", classFile.ConstantPoolCount)
+
+	HeaderPrinter.Printf("\nConstantPool:")
+	fmt.Printf(" (%v entries)\n", classFile.ConstantPoolCount)
 	printCP(classFile)
-	fmt.Printf("\nMethods: (%v entries)\n", classFile.MethodsCount)
+
+	HeaderPrinter.Printf("\nMethods:")
+	fmt.Printf(" (%v entries)\n", classFile.MethodsCount)
 	printMethods(classFile)
-	fmt.Printf("\nFields: (%v entries)\n", classFile.FieldsCount)
+
+	HeaderPrinter.Printf("\nFields:")
+	fmt.Printf(" (%v entries)\n", classFile.FieldsCount)
 	printFields(classFile)
+
 	fmt.Printf("\nAttrs: (%v entries)\n", classFile.AttrsCount)
 	printAttrs(classFile)
 }
