@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"math"
 )
 
@@ -177,10 +178,8 @@ func readCpEntry(reader *bytes.Reader) CpEntry {
 		info.Tag = tag
 		binary.Read(reader, binary.BigEndian, &info.Length)
 		// TODO: see if there's another simpler way of doing this
-		for i := uint16(0); i < info.Length; i++ {
-			b, _ := reader.ReadByte()
-			info.Bytes = append(info.Bytes, b)
-		}
+		info.Bytes = make([]byte, info.Length)
+		io.ReadFull(reader, info.Bytes)
 		return &info
 	case CONSTANT_MethodHandle:
 		var info CONSTANT_MethodHandle_info
@@ -220,11 +219,8 @@ func readAttr(reader *bytes.Reader) AttrInfo {
 	var attrInfo AttrInfo
 	binary.Read(reader, binary.BigEndian, &attrInfo.NameIndex)
 	binary.Read(reader, binary.BigEndian, &attrInfo.AttrLength)
-	// Read binary data
-	for i := uint32(0); i < attrInfo.AttrLength; i++ {
-		b, _ := reader.ReadByte()
-		attrInfo.AttrData = append(attrInfo.AttrData, b)
-	}
+	attrInfo.AttrData = make([]byte, attrInfo.AttrLength)
+	io.ReadFull(reader, attrInfo.AttrData)
 	return attrInfo
 }
 
