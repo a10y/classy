@@ -10,9 +10,10 @@ import (
 )
 
 var (
-	HeaderPrinter    *color.Color = color.New(color.FgYellow)
-	SuccessColorizer              = color.New(color.BgGreen, color.FgWhite)
+	HeaderColorizer  *color.Color = color.New(color.FgYellow, color.Bold)
+	SuccessColorizer              = color.New(color.BgWhite, color.FgBlack)
 	ErrorColorizer                = color.New(color.FgWhite, color.BgRed)
+	AuxColorizer                  = color.New(color.FgBlue, color.Bold)
 )
 
 func main() {
@@ -27,23 +28,27 @@ func main() {
 		validMsg = ErrorColorizer.Sprintf("INVALID")
 	}
 
-	fmt.Printf("Magic: 0x%X (%v)\n", classFile.Magic, validMsg)
-	fmt.Printf("Major: %v\n", classFile.MajorVersion)
-	fmt.Printf("Minor: %v\n", classFile.MinorVersion)
+	AuxColorizer.Printf("Magic:")
+	fmt.Printf(" 0x%X (%v)\n", classFile.Magic, validMsg)
+	AuxColorizer.Printf("Major:")
+	fmt.Printf(" %v\n", classFile.MajorVersion)
+	AuxColorizer.Printf("Minor:")
+	fmt.Printf(" %v\n", classFile.MinorVersion)
 
-	HeaderPrinter.Printf("\nConstantPool:")
+	HeaderColorizer.Printf("\nConstantPool:")
 	fmt.Printf(" (%v entries)\n", classFile.ConstantPoolCount)
 	printCP(classFile)
 
-	HeaderPrinter.Printf("\nMethods:")
+	HeaderColorizer.Printf("\nMethods:")
 	fmt.Printf(" (%v entries)\n", classFile.MethodsCount)
 	printMethods(classFile)
 
-	HeaderPrinter.Printf("\nFields:")
+	HeaderColorizer.Printf("\nFields:")
 	fmt.Printf(" (%v entries)\n", classFile.FieldsCount)
 	printFields(classFile)
 
-	fmt.Printf("\nAttrs: (%v entries)\n", classFile.AttrsCount)
+	HeaderColorizer.Printf("\nAttrs:")
+	fmt.Printf(" (%v entries)\n", classFile.AttrsCount)
 	printAttrs(classFile)
 }
 
