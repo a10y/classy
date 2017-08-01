@@ -75,8 +75,8 @@ func ReadClassFile(raw []byte) *ClassFile {
 
 	reader := bytes.NewReader(raw)
 	binary.Read(reader, binary.BigEndian, &classFile.Magic)
-	binary.Read(reader, binary.BigEndian, &classFile.MajorVersion)
 	binary.Read(reader, binary.BigEndian, &classFile.MinorVersion)
+	binary.Read(reader, binary.BigEndian, &classFile.MajorVersion)
 	binary.Read(reader, binary.BigEndian, &classFile.ConstantPoolCount)
 
 	// Read constant pool entries
