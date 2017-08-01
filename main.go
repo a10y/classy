@@ -24,6 +24,8 @@ func main() {
 	printMethods(classFile)
 	fmt.Printf("\nFields: %v\n", classFile.FieldsCount)
 	printFields(classFile)
+	fmt.Printf("\nAttrs: %v\n", classFile.AttrsCount)
+	printAttrs(classFile)
 }
 
 func printCP(cf *classfile.ClassFile) {
@@ -41,5 +43,11 @@ func printMethods(cf *classfile.ClassFile) {
 func printFields(cf *classfile.ClassFile) {
 	for _, field := range cf.Fields {
 		fmt.Printf("  | %v\n", field.Name(cf.ConstantPool))
+	}
+}
+
+func printAttrs(cf *classfile.ClassFile) {
+	for _, attr := range cf.Attrs {
+		fmt.Printf("  | %v\n", attr.Name(cf.ConstantPool))
 	}
 }

@@ -251,7 +251,7 @@ type FieldInfo struct {
 }
 
 func (i *FieldInfo) Name(cp []CpEntry) string {
-	idx := i.NameIndex + 1
+	idx := i.NameIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
 	return string(ent.Bytes[:ent.Length])
 }
@@ -260,6 +260,12 @@ type AttrInfo struct {
 	NameIndex  uint16
 	AttrLength uint32
 	AttrData   []byte
+}
+
+func (i *AttrInfo) Name(cp []CpEntry) string {
+	idx := i.NameIndex - 1
+	ent := cp[idx].(*CONSTANT_Utf8_info)
+	return string(ent.Bytes[:ent.Length])
 }
 
 type MethodInfo struct {
@@ -271,7 +277,7 @@ type MethodInfo struct {
 }
 
 func (i *MethodInfo) Name(cp []CpEntry) string {
-	idx := i.NameIndex + 1
+	idx := i.NameIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
 	return string(ent.Bytes[:ent.Length])
 }
