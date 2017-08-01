@@ -31,7 +31,7 @@ const (
 	CONSTANT_Fieldref                       = 9
 	CONSTANT_Methodref                      = 10
 	CONSTANT_InterfaceMethodref             = 11
-	CONSTANT_string                         = 8
+	CONSTANT_String                         = 8
 	CONSTANT_Integer                        = 3
 	CONSTANT_Float                          = 4
 	CONSTANT_Long                           = 5
@@ -139,8 +139,8 @@ func readCpEntry(reader *bytes.Reader) CpEntry {
 		binary.Read(reader, binary.BigEndian, &info.ClassIndex)
 		binary.Read(reader, binary.BigEndian, &info.NameAndTypeIndex)
 		return &info
-	case CONSTANT_string:
-		var info CONSTANT_string_info
+	case CONSTANT_String:
+		var info CONSTANT_String_info
 		info.Tag = tag
 		binary.Read(reader, binary.BigEndian, &info.stringIndex)
 		return &info
@@ -221,7 +221,7 @@ func readAttr(reader *bytes.Reader) AttrInfo {
 	binary.Read(reader, binary.BigEndian, &attrInfo.NameIndex)
 	binary.Read(reader, binary.BigEndian, &attrInfo.AttrLength)
 	// Read binary data
-	for i := uint16(0); i < attrInfo.AttrLength; i++ {
+	for i := uint32(0); i < attrInfo.AttrLength; i++ {
 		b, _ := reader.ReadByte()
 		attrInfo.AttrData = append(attrInfo.AttrData, b)
 	}
@@ -241,7 +241,8 @@ func readMethod(reader *bytes.Reader) MethodInfo {
 }
 
 type CpEntry interface {
-	GetTag() ConstantTag
+	StringTag() string
+	RawTag() ConstantTag
 	Display() string
 }
 
@@ -253,9 +254,15 @@ type FieldInfo struct {
 	Attrs           []AttrInfo
 }
 
+func (i *FieldInfo) Name(cp []CpEntry) string {
+	idx := i.NameIndex + 1
+	ent := cp[idx].(*CONSTANT_Utf8_info)
+	return string(ent.Bytes[:ent.Length])
+}
+
 type AttrInfo struct {
 	NameIndex  uint16
-	AttrLength uint16
+	AttrLength uint32
 	AttrData   []byte
 }
 
@@ -267,18 +274,28 @@ type MethodInfo struct {
 	Attrs           []AttrInfo
 }
 
+func (i *MethodInfo) Name(cp []CpEntry) string {
+	idx := i.NameIndex + 1
+	ent := cp[idx].(*CONSTANT_Utf8_info)
+	return string(ent.Bytes[:ent.Length])
+}
+
 type CONSTANT_Class_info struct {
 	Tag       ConstantTag
 	NameIndex uint16
 }
 
-func (i *CONSTANT_Class_info) GetTag() ConstantTag {
+func (i *CONSTANT_Class_info) StringTag() string {
+	return "CONSTANT_Class"
+}
+
+func (i *CONSTANT_Class_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_Class_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_Fieldref_info struct {
@@ -287,13 +304,17 @@ type CONSTANT_Fieldref_info struct {
 	NameAndTypeIndex uint16
 }
 
-func (i *CONSTANT_Fieldref_info) GetTag() ConstantTag {
+func (i *CONSTANT_Fieldref_info) StringTag() string {
+	return "CONSTANT_Fieldref"
+}
+
+func (i *CONSTANT_Fieldref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_Fieldref_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_Methodref_info struct {
@@ -302,13 +323,17 @@ type CONSTANT_Methodref_info struct {
 	NameAndTypeIndex uint16
 }
 
-func (i *CONSTANT_Methodref_info) GetTag() ConstantTag {
+func (i *CONSTANT_Methodref_info) StringTag() string {
+	return "CONSTANT_Methodref"
+}
+
+func (i *CONSTANT_Methodref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_Methodref_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_InterfaceMethodref_info struct {
@@ -317,27 +342,35 @@ type CONSTANT_InterfaceMethodref_info struct {
 	NameAndTypeIndex uint16
 }
 
-func (i *CONSTANT_InterfaceMethodref_info) GetTag() ConstantTag {
+func (i *CONSTANT_InterfaceMethodref_info) StringTag() string {
+	return "CONSTANT_InterfaceMethodref"
+}
+
+func (i *CONSTANT_InterfaceMethodref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_InterfaceMethodref_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
-type CONSTANT_string_info struct {
+type CONSTANT_String_info struct {
 	Tag         ConstantTag
 	stringIndex uint16
 }
 
-func (i *CONSTANT_string_info) GetTag() ConstantTag {
+func (i *CONSTANT_String_info) StringTag() string {
+	return "CONSTANT_String"
+}
+
+func (i *CONSTANT_String_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_string_info) Display() string {
+func (i *CONSTANT_String_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_Integer_info struct {
@@ -345,13 +378,17 @@ type CONSTANT_Integer_info struct {
 	Value uint32
 }
 
-func (i *CONSTANT_Integer_info) GetTag() ConstantTag {
+func (i *CONSTANT_Integer_info) StringTag() string {
+	return "CONSTANT_Integer"
+}
+
+func (i *CONSTANT_Integer_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_Integer_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_Float_info struct {
@@ -359,13 +396,17 @@ type CONSTANT_Float_info struct {
 	Value float32
 }
 
-func (i *CONSTANT_Float_info) GetTag() ConstantTag {
+func (i *CONSTANT_Float_info) StringTag() string {
+	return "CONSTANT_Float"
+}
+
+func (i *CONSTANT_Float_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_Float_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_Long_info struct {
@@ -380,13 +421,17 @@ func (li *CONSTANT_Long_info) Value() uint64 {
 	return res
 }
 
-func (i *CONSTANT_Long_info) Display() string {
-	// Fill me in
-	return ""
+func (i *CONSTANT_Long_info) StringTag() string {
+	return "CONSTANT_Long"
 }
 
-func (i *CONSTANT_Long_info) GetTag() ConstantTag {
+func (i *CONSTANT_Long_info) RawTag() ConstantTag {
 	return i.Tag
+}
+
+func (i *CONSTANT_Long_info) Display() string {
+	// Fill me in
+	return i.StringTag()
 }
 
 type CONSTANT_Double_info struct {
@@ -395,14 +440,22 @@ type CONSTANT_Double_info struct {
 	LowBytes  uint32
 }
 
-func (i *CONSTANT_Double_info) GetTag() ConstantTag {
+func (i *CONSTANT_Double_info) Value() float64 {
+	binary := uint64(i.HighBytes)
+	binary &= uint64(i.LowBytes)
+	return math.Float64frombits(binary)
+}
+
+func (i *CONSTANT_Double_info) StringTag() string {
+	return "CONSTANT_Double"
+}
+
+func (i *CONSTANT_Double_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_Double_info) Display() string {
-	binary := uint64(i.HighBytes)
-	binary &= uint64(i.LowBytes)
-	val := math.Float64frombits(binary)
+	val := i.Value()
 	return fmt.Sprintf("%v", val)
 }
 
@@ -412,12 +465,16 @@ type CONSTANT_NameAndType_info struct {
 	DescriptorIndex uint16
 }
 
-func (i *CONSTANT_NameAndType_info) Display() string {
-	// Fill me in
-	return ""
+func (i *CONSTANT_NameAndType_info) StringTag() string {
+	return "CONSTANT_NameAndType"
 }
 
-func (i *CONSTANT_NameAndType_info) GetTag() ConstantTag {
+func (i *CONSTANT_NameAndType_info) Display() string {
+	// Fill me in
+	return i.StringTag()
+}
+
+func (i *CONSTANT_NameAndType_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
@@ -427,13 +484,17 @@ type CONSTANT_Utf8_info struct {
 	Bytes  []byte
 }
 
-func (i *CONSTANT_Utf8_info) GetTag() ConstantTag {
+func (i *CONSTANT_Utf8_info) StringTag() string {
+	return "CONSTANT_Utf8"
+}
+
+func (i *CONSTANT_Utf8_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_Utf8_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_MethodHandle_info struct {
@@ -442,13 +503,17 @@ type CONSTANT_MethodHandle_info struct {
 	ReferenceIndex uint16
 }
 
-func (i *CONSTANT_MethodHandle_info) GetTag() ConstantTag {
+func (i *CONSTANT_MethodHandle_info) StringTag() string {
+	return "CONSTANT_MethodHandle"
+}
+
+func (i *CONSTANT_MethodHandle_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_MethodHandle_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_MethodType_info struct {
@@ -456,13 +521,17 @@ type CONSTANT_MethodType_info struct {
 	DescriptorIndex uint16
 }
 
-func (i *CONSTANT_MethodType_info) GetTag() ConstantTag {
+func (i *CONSTANT_MethodType_info) StringTag() string {
+	return "CONSTANT_MethodType"
+}
+
+func (i *CONSTANT_MethodType_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_MethodType_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
 
 type CONSTANT_InvokeDynamic_info struct {
@@ -471,11 +540,15 @@ type CONSTANT_InvokeDynamic_info struct {
 	NameAndTypeIndex         uint16
 }
 
-func (i *CONSTANT_InvokeDynamic_info) GetTag() ConstantTag {
+func (i *CONSTANT_InvokeDynamic_info) StringTag() string {
+	return "CONSTANT_InvokeDynamic"
+}
+
+func (i *CONSTANT_InvokeDynamic_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
 func (i *CONSTANT_InvokeDynamic_info) Display() string {
 	// Fill me in
-	return ""
+	return i.StringTag()
 }
