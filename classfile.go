@@ -1,5 +1,5 @@
 // Types and functions for parsing JVM Classfiles.
-package classfile
+package classy
 
 // Shortcut for a uint16 that represents an access flag for the class, field, or method
 type Access uint16
