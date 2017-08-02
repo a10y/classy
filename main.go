@@ -54,6 +54,10 @@ func main() {
 
 func printCP(cf *classfile.ClassFile) {
 	for i, cpEntry := range cf.ConstantPool {
+		// Skip over empty continuation slots for 8-byte constants
+		if cpEntry == nil {
+			continue
+		}
 		branch := "├──"
 		if i == int(cf.ConstantPoolCount)-2 {
 			branch = "└──"
@@ -68,7 +72,7 @@ func printMethods(cf *classfile.ClassFile) {
 		if i == int(cf.MethodsCount)-1 {
 			branch = "└──"
 		}
-		fmt.Printf("  %v %v\n", branch, meth.Name(cf.ConstantPool))
+		fmt.Printf("  %v %v%v\n", branch, meth.Name(cf.ConstantPool), meth.Descriptor(cf.ConstantPool))
 	}
 }
 
@@ -78,7 +82,8 @@ func printFields(cf *classfile.ClassFile) {
 		if i == int(cf.FieldsCount)-1 {
 			branch = "└──"
 		}
-		fmt.Printf("  %v %v\n", branch, field.Name(cf.ConstantPool))
+		desc := classfile.ParseDescriptor(field.Descriptor(cf.ConstantPool))
+		fmt.Printf("  %v %v %v\n", branch, desc, field.Name(cf.ConstantPool))
 	}
 }
 

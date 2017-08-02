@@ -81,7 +81,19 @@ func ReadClassFile(raw []byte) *ClassFile {
 
 	// Read constant pool entries
 	for i := uint16(1); i <= classFile.ConstantPoolCount-1; i++ {
-		classFile.ConstantPool = append(classFile.ConstantPool, readCpEntry(reader))
+		ent := readCpEntry(reader)
+		fmt.Printf("%v: %v\n", i, ent.Display())
+		classFile.ConstantPool = append(classFile.ConstantPool, ent)
+		// Check to see if the entry is one of the 8-byte varieties
+		// If so, we skip a slot
+		if _, ok := ent.(*CONSTANT_Double_info); ok {
+			classFile.ConstantPool = append(classFile.ConstantPool, nil)
+			i++
+		}
+		if _, ok := ent.(*CONSTANT_Long_info); ok {
+			classFile.ConstantPool = append(classFile.ConstantPool, nil)
+			i++
+		}
 	}
 
 	binary.Read(reader, binary.BigEndian, &classFile.AccessFlags)
@@ -116,6 +128,7 @@ func ReadClassFile(raw []byte) *ClassFile {
 func readCpEntry(reader *bytes.Reader) CpEntry {
 	var tag ConstantTag
 	binary.Read(reader, binary.BigEndian, &tag)
+	//fmt.Printf("tag %v\n", tag)
 	switch tag {
 	case CONSTANT_Class:
 		var info CONSTANT_Class_info
@@ -160,6 +173,7 @@ func readCpEntry(reader *bytes.Reader) CpEntry {
 		info.Tag = tag
 		binary.Read(reader, binary.BigEndian, &info.HighBytes)
 		binary.Read(reader, binary.BigEndian, &info.LowBytes)
+		// Push a BS copy as well
 		return &info
 	case CONSTANT_Double:
 		var info CONSTANT_Double_info
@@ -265,6 +279,13 @@ func (i *FieldInfo) Name(cp []CpEntry) string {
 	return string(ent.Bytes[:ent.Length])
 }
 
+// Get the string representation of field's type descriptor
+func (i *FieldInfo) Descriptor(cp []CpEntry) string {
+	idx := i.DescriptorIndex - 1
+	ent := cp[idx].(*CONSTANT_Utf8_info)
+	return string(ent.Bytes[:ent.Length])
+}
+
 // Information corresponding to attributes
 type AttrInfo struct {
 	NameIndex  uint16
@@ -291,6 +312,12 @@ type MethodInfo struct {
 // Get the name of the method
 func (i *MethodInfo) Name(cp []CpEntry) string {
 	idx := i.NameIndex - 1
+	ent := cp[idx].(*CONSTANT_Utf8_info)
+	return string(ent.Bytes[:ent.Length])
+}
+
+func (i *MethodInfo) Descriptor(cp []CpEntry) string {
+	idx := i.DescriptorIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
 	return string(ent.Bytes[:ent.Length])
 }
@@ -482,8 +509,7 @@ func (i *CONSTANT_Double_info) RawTag() ConstantTag {
 }
 
 func (i *CONSTANT_Double_info) Display() string {
-	val := i.Value()
-	return fmt.Sprintf("%v", val)
+	return fmt.Sprintf("%v\t\t\t(%v)", i.StringTag(), i.Value())
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -521,9 +547,13 @@ func (i *CONSTANT_Utf8_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
+func (i *CONSTANT_Utf8_info) Value() string {
+	return string(i.Bytes[:i.Length])
+}
+
 func (i *CONSTANT_Utf8_info) Display() string {
 	// Fill me in
-	return i.StringTag()
+	return fmt.Sprintf("%v\t\t\t'%v'", i.StringTag(), i.Value())
 }
 
 // Corresponds to eponymous struct in the spec.
