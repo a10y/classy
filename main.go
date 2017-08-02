@@ -108,3 +108,8 @@ func printAttrs(cf *classfile.ClassFile) {
 		fmt.Printf("  %v %v\n", branch, attr.Name(cf.ConstantPool))
 	}
 }
+
+// TODO: disassembly?
+// TODO: colorize attributes and constant pool entries
+// TODO: add constant pool info for methodref, instancemethodref, etc.
+// TODO: disable access flags for fields/methods
