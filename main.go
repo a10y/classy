@@ -67,7 +67,7 @@ func printCP(cf *classfile.ClassFile) {
 			branch = "└──"
 		}
 		fmt.Printf("  %v %02d: %v\n", branch, i+1, cpEntry.StringTag())
-		fmt.Printf("  │\t\t%v\n", cpEntry.Display(cf.ConstantPool))
+		fmt.Printf("  │\t\t%v\n", cpEntry.Repr(cf.ConstantPool))
 	}
 }
 

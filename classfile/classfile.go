@@ -258,7 +258,7 @@ type CpEntry interface {
 	// Get the raw integer tag
 	RawTag() ConstantTag
 	// Get a string representation of the entry
-	Display([]CpEntry) string
+	Repr([]CpEntry) string
 }
 
 // Classfile field information
@@ -342,7 +342,7 @@ func (i *CONSTANT_Class_info) Name(cp []CpEntry) string {
 	return string(ent.Bytes[:ent.Length])
 }
 
-func (i *CONSTANT_Class_info) Display(cp []CpEntry) string {
+func (i *CONSTANT_Class_info) Repr(cp []CpEntry) string {
 	return i.Name(cp)
 }
 
@@ -362,7 +362,7 @@ func (i *CONSTANT_Fieldref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Fieldref_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_Fieldref_info) Repr(ignored []CpEntry) string {
 	return ""
 }
 
@@ -382,7 +382,7 @@ func (i *CONSTANT_Methodref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Methodref_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_Methodref_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return ""
 }
@@ -402,7 +402,7 @@ func (i *CONSTANT_InterfaceMethodref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_InterfaceMethodref_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_InterfaceMethodref_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return ""
 }
@@ -421,7 +421,7 @@ func (i *CONSTANT_String_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_String_info) Display(cp []CpEntry) string {
+func (i *CONSTANT_String_info) Repr(cp []CpEntry) string {
 	idx := i.StringIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
 	val := string(ent.Bytes[:ent.Length])
@@ -442,7 +442,7 @@ func (i *CONSTANT_Integer_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Integer_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_Integer_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return fmt.Sprintf("%v", i.Value)
 }
@@ -461,7 +461,7 @@ func (i *CONSTANT_Float_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Float_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_Float_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return fmt.Sprintf("%v", i.Value)
 }
@@ -487,7 +487,7 @@ func (i *CONSTANT_Long_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Long_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_Long_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return fmt.Sprintf("%v", i.Value())
 }
@@ -513,7 +513,7 @@ func (i *CONSTANT_Double_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Double_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_Double_info) Repr(ignored []CpEntry) string {
 	return fmt.Sprintf("%v", i.Value())
 }
 
@@ -528,7 +528,7 @@ func (i *CONSTANT_NameAndType_info) StringTag() string {
 	return "CONSTANT_NameAndType"
 }
 
-func (i *CONSTANT_NameAndType_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_NameAndType_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return ""
 }
@@ -556,7 +556,7 @@ func (i *CONSTANT_Utf8_info) Value() string {
 	return string(i.Bytes[:i.Length])
 }
 
-func (i *CONSTANT_Utf8_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_Utf8_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return fmt.Sprintf("\"%v\"", i.Value())
 }
@@ -576,7 +576,7 @@ func (i *CONSTANT_MethodHandle_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_MethodHandle_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_MethodHandle_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return ""
 }
@@ -595,7 +595,7 @@ func (i *CONSTANT_MethodType_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_MethodType_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_MethodType_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return ""
 }
@@ -615,7 +615,7 @@ func (i *CONSTANT_InvokeDynamic_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_InvokeDynamic_info) Display(ignored []CpEntry) string {
+func (i *CONSTANT_InvokeDynamic_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return ""
 }
