@@ -17,6 +17,7 @@ var (
 	AuxColorizer                  = color.New(color.FgBlue, color.Bold)
 	FieldTypeColor                = color.New(color.FgHiMagenta)
 	FieldNameColor                = color.New(color.FgCyan, color.Bold)
+	ParamTypeColor                = color.New(color.FgRed)
 )
 
 func main() {
@@ -77,8 +78,11 @@ func printMethods(cf *classfile.ClassFile) {
 			branch = "└──"
 		}
 		name := meth.Name(cf.ConstantPool)
-		params, ret := classfile.ParseMethodDescriptor(meth.Descriptor(cf.ConstantPool))
-		repr := fmt.Sprintf("%v %v(%v)\n", ret, name, strings.Join(params, ", "))
+		paramSlice, ret := classfile.ParseMethodDescriptor(meth.Descriptor(cf.ConstantPool))
+		ret = FieldTypeColor.Sprint(ret)
+		name = FieldNameColor.Sprint(name)
+		params := ParamTypeColor.Sprint(strings.Join(paramSlice, ", "))
+		repr := fmt.Sprintf("%v %v(%v)\n", ret, name, params)
 		fmt.Printf("  %v %v", branch, repr)
 	}
 }
