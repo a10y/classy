@@ -1,4 +1,4 @@
-// Types and functions for manipulating classfiles that follow the JVM specification.
+// Types and functions for parsing JVM Classfiles.
 package classfile
 
 import (
@@ -112,8 +112,8 @@ func ReadClassFile(raw []byte) *ClassFile {
 	return &classFile
 }
 
+// Read a constant pool entry from the classfile
 func readCpEntry(reader *bytes.Reader) CpEntry {
-	// Read in the bytes data
 	var tag ConstantTag
 	binary.Read(reader, binary.BigEndian, &tag)
 	switch tag {
@@ -177,7 +177,6 @@ func readCpEntry(reader *bytes.Reader) CpEntry {
 		var info CONSTANT_Utf8_info
 		info.Tag = tag
 		binary.Read(reader, binary.BigEndian, &info.Length)
-		// TODO: see if there's another simpler way of doing this
 		info.Bytes = make([]byte, info.Length)
 		io.ReadFull(reader, info.Bytes)
 		return &info
@@ -203,6 +202,7 @@ func readCpEntry(reader *bytes.Reader) CpEntry {
 	}
 }
 
+// Read a field_info struct
 func readField(reader *bytes.Reader) FieldInfo {
 	var fieldInfo FieldInfo
 	binary.Read(reader, binary.BigEndian, &fieldInfo.AccessFlags)
@@ -215,6 +215,7 @@ func readField(reader *bytes.Reader) FieldInfo {
 	return fieldInfo
 }
 
+// Read an attribute_info struct
 func readAttr(reader *bytes.Reader) AttrInfo {
 	var attrInfo AttrInfo
 	binary.Read(reader, binary.BigEndian, &attrInfo.NameIndex)
@@ -224,6 +225,7 @@ func readAttr(reader *bytes.Reader) AttrInfo {
 	return attrInfo
 }
 
+// Reads a method_info struct
 func readMethod(reader *bytes.Reader) MethodInfo {
 	var methodInfo MethodInfo
 	binary.Read(reader, binary.BigEndian, &methodInfo.AccessFlags)
@@ -236,12 +238,17 @@ func readMethod(reader *bytes.Reader) MethodInfo {
 	return methodInfo
 }
 
+// An entry that exists in the classfile's constant pool
 type CpEntry interface {
+	// Get the string representation of the tag
 	StringTag() string
+	// Get the raw integer tag
 	RawTag() ConstantTag
+	// Get a string representation of the entry
 	Display() string
 }
 
+// Classfile field information
 type FieldInfo struct {
 	AccessFlags     uint16
 	NameIndex       uint16
@@ -250,24 +257,29 @@ type FieldInfo struct {
 	Attrs           []AttrInfo
 }
 
+// Get the String name of the field
+// It requires looking up a CONSTANT_Utf8 entry in the constant pool.
 func (i *FieldInfo) Name(cp []CpEntry) string {
 	idx := i.NameIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
 	return string(ent.Bytes[:ent.Length])
 }
 
+// Information corresponding to attributes
 type AttrInfo struct {
 	NameIndex  uint16
 	AttrLength uint32
 	AttrData   []byte
 }
 
+// Get the name of the attribute
 func (i *AttrInfo) Name(cp []CpEntry) string {
 	idx := i.NameIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
 	return string(ent.Bytes[:ent.Length])
 }
 
+// Corresponds to the method_info type in the spec.
 type MethodInfo struct {
 	AccessFlags     uint16
 	NameIndex       uint16
@@ -276,12 +288,15 @@ type MethodInfo struct {
 	Attrs           []AttrInfo
 }
 
+// Get the name of the method
 func (i *MethodInfo) Name(cp []CpEntry) string {
 	idx := i.NameIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
 	return string(ent.Bytes[:ent.Length])
 }
 
+// Constant pool entry for classes.
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Class_info struct {
 	Tag       ConstantTag
 	NameIndex uint16
@@ -300,6 +315,8 @@ func (i *CONSTANT_Class_info) Display() string {
 	return i.StringTag()
 }
 
+// Constant pool entry for field references.
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Fieldref_info struct {
 	Tag              ConstantTag
 	ClassIndex       uint16
@@ -319,6 +336,8 @@ func (i *CONSTANT_Fieldref_info) Display() string {
 	return i.StringTag()
 }
 
+// Constant pool entry referencing a method.
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Methodref_info struct {
 	Tag              ConstantTag
 	ClassIndex       uint16
@@ -338,6 +357,7 @@ func (i *CONSTANT_Methodref_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_InterfaceMethodref_info struct {
 	Tag              ConstantTag
 	ClassIndex       uint16
@@ -357,6 +377,7 @@ func (i *CONSTANT_InterfaceMethodref_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_String_info struct {
 	Tag         ConstantTag
 	stringIndex uint16
@@ -375,6 +396,7 @@ func (i *CONSTANT_String_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Integer_info struct {
 	Tag   ConstantTag
 	Value uint32
@@ -393,6 +415,7 @@ func (i *CONSTANT_Integer_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Float_info struct {
 	Tag   ConstantTag
 	Value float32
@@ -411,6 +434,7 @@ func (i *CONSTANT_Float_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Long_info struct {
 	Tag       ConstantTag
 	HighBytes uint32
@@ -436,6 +460,7 @@ func (i *CONSTANT_Long_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Double_info struct {
 	Tag       ConstantTag
 	HighBytes uint32
@@ -461,6 +486,7 @@ func (i *CONSTANT_Double_info) Display() string {
 	return fmt.Sprintf("%v", val)
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_NameAndType_info struct {
 	Tag             ConstantTag
 	NameIndex       uint16
@@ -480,6 +506,7 @@ func (i *CONSTANT_NameAndType_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_Utf8_info struct {
 	Tag    ConstantTag
 	Length uint16
@@ -499,6 +526,7 @@ func (i *CONSTANT_Utf8_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_MethodHandle_info struct {
 	Tag            ConstantTag
 	ReferenceKind  byte
@@ -518,6 +546,7 @@ func (i *CONSTANT_MethodHandle_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_MethodType_info struct {
 	Tag             ConstantTag
 	DescriptorIndex uint16
@@ -536,6 +565,7 @@ func (i *CONSTANT_MethodType_info) Display() string {
 	return i.StringTag()
 }
 
+// Corresponds to eponymous struct in the spec.
 type CONSTANT_InvokeDynamic_info struct {
 	Tag                      ConstantTag
 	BootstrapMethodAttrIndex uint16
