@@ -15,6 +15,8 @@ var (
 	SuccessColorizer              = color.New(color.BgWhite, color.FgBlack)
 	ErrorColorizer                = color.New(color.FgWhite, color.BgRed)
 	AuxColorizer                  = color.New(color.FgBlue, color.Bold)
+	FieldTypeColor                = color.New(color.FgHiMagenta)
+	FieldNameColor                = color.New(color.FgCyan, color.Bold)
 )
 
 func main() {
@@ -63,7 +65,8 @@ func printCP(cf *classfile.ClassFile) {
 		if i == int(cf.ConstantPoolCount)-2 {
 			branch = "└──"
 		}
-		fmt.Printf("  %v %02d: %v\n", branch, i+1, cpEntry.Display())
+		fmt.Printf("  %v %02d: %v\n", branch, i+1, cpEntry.StringTag())
+		fmt.Printf("  │\t\t%v\n", cpEntry.Display(cf.ConstantPool))
 	}
 }
 
@@ -86,8 +89,9 @@ func printFields(cf *classfile.ClassFile) {
 		if i == int(cf.FieldsCount)-1 {
 			branch = "└──"
 		}
-		desc := classfile.ParseFieldDescriptor(field.Descriptor(cf.ConstantPool))
-		fmt.Printf("  %v %v %v\n", branch, desc, field.Name(cf.ConstantPool))
+		desc := FieldTypeColor.Sprint(classfile.ParseFieldDescriptor(field.Descriptor(cf.ConstantPool)))
+		name := FieldNameColor.Sprint(field.Name(cf.ConstantPool))
+		fmt.Printf("  %v %v %v\n", branch, desc, name)
 	}
 }
 

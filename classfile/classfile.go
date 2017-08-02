@@ -155,7 +155,7 @@ func readCpEntry(reader *bytes.Reader) CpEntry {
 	case CONSTANT_String:
 		var info CONSTANT_String_info
 		info.Tag = tag
-		binary.Read(reader, binary.BigEndian, &info.stringIndex)
+		binary.Read(reader, binary.BigEndian, &info.StringIndex)
 		return &info
 	case CONSTANT_Integer:
 		var info CONSTANT_Integer_info
@@ -258,7 +258,7 @@ type CpEntry interface {
 	// Get the raw integer tag
 	RawTag() ConstantTag
 	// Get a string representation of the entry
-	Display() string
+	Display([]CpEntry) string
 }
 
 // Classfile field information
@@ -336,9 +336,14 @@ func (i *CONSTANT_Class_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Class_info) Display() string {
-	// Fill me in
-	return i.StringTag()
+func (i *CONSTANT_Class_info) Name(cp []CpEntry) string {
+	idx := i.NameIndex - 1
+	ent := cp[idx].(*CONSTANT_Utf8_info)
+	return string(ent.Bytes[:ent.Length])
+}
+
+func (i *CONSTANT_Class_info) Display(cp []CpEntry) string {
+	return i.Name(cp)
 }
 
 // Constant pool entry for field references.
@@ -357,9 +362,8 @@ func (i *CONSTANT_Fieldref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Fieldref_info) Display() string {
-	// Fill me in
-	return i.StringTag()
+func (i *CONSTANT_Fieldref_info) Display(ignored []CpEntry) string {
+	return ""
 }
 
 // Constant pool entry referencing a method.
@@ -378,9 +382,9 @@ func (i *CONSTANT_Methodref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Methodref_info) Display() string {
+func (i *CONSTANT_Methodref_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return ""
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -398,15 +402,15 @@ func (i *CONSTANT_InterfaceMethodref_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_InterfaceMethodref_info) Display() string {
+func (i *CONSTANT_InterfaceMethodref_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return ""
 }
 
 // Corresponds to eponymous struct in the spec.
 type CONSTANT_String_info struct {
 	Tag         ConstantTag
-	stringIndex uint16
+	StringIndex uint16
 }
 
 func (i *CONSTANT_String_info) StringTag() string {
@@ -417,9 +421,11 @@ func (i *CONSTANT_String_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_String_info) Display() string {
-	// Fill me in
-	return i.StringTag()
+func (i *CONSTANT_String_info) Display(cp []CpEntry) string {
+	idx := i.StringIndex - 1
+	ent := cp[idx].(*CONSTANT_Utf8_info)
+	val := string(ent.Bytes[:ent.Length])
+	return fmt.Sprintf("\"%v\"", val)
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -436,9 +442,9 @@ func (i *CONSTANT_Integer_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Integer_info) Display() string {
+func (i *CONSTANT_Integer_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return fmt.Sprintf("%v", i.Value)
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -455,9 +461,9 @@ func (i *CONSTANT_Float_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Float_info) Display() string {
+func (i *CONSTANT_Float_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return fmt.Sprintf("%v", i.Value)
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -481,9 +487,9 @@ func (i *CONSTANT_Long_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Long_info) Display() string {
+func (i *CONSTANT_Long_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return fmt.Sprintf("%v", i.Value())
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -507,8 +513,8 @@ func (i *CONSTANT_Double_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_Double_info) Display() string {
-	return fmt.Sprintf("%v\t\t\t(%v)", i.StringTag(), i.Value())
+func (i *CONSTANT_Double_info) Display(ignored []CpEntry) string {
+	return fmt.Sprintf("%v", i.Value())
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -522,9 +528,9 @@ func (i *CONSTANT_NameAndType_info) StringTag() string {
 	return "CONSTANT_NameAndType"
 }
 
-func (i *CONSTANT_NameAndType_info) Display() string {
+func (i *CONSTANT_NameAndType_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return ""
 }
 
 func (i *CONSTANT_NameAndType_info) RawTag() ConstantTag {
@@ -550,9 +556,9 @@ func (i *CONSTANT_Utf8_info) Value() string {
 	return string(i.Bytes[:i.Length])
 }
 
-func (i *CONSTANT_Utf8_info) Display() string {
+func (i *CONSTANT_Utf8_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return fmt.Sprintf("%v\t\t\t'%v'", i.StringTag(), i.Value())
+	return fmt.Sprintf("\"%v\"", i.Value())
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -570,9 +576,9 @@ func (i *CONSTANT_MethodHandle_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_MethodHandle_info) Display() string {
+func (i *CONSTANT_MethodHandle_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return ""
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -589,9 +595,9 @@ func (i *CONSTANT_MethodType_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_MethodType_info) Display() string {
+func (i *CONSTANT_MethodType_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return ""
 }
 
 // Corresponds to eponymous struct in the spec.
@@ -609,7 +615,7 @@ func (i *CONSTANT_InvokeDynamic_info) RawTag() ConstantTag {
 	return i.Tag
 }
 
-func (i *CONSTANT_InvokeDynamic_info) Display() string {
+func (i *CONSTANT_InvokeDynamic_info) Display(ignored []CpEntry) string {
 	// Fill me in
-	return i.StringTag()
+	return ""
 }
