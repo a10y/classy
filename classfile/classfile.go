@@ -82,7 +82,6 @@ func ReadClassFile(raw []byte) *ClassFile {
 	// Read constant pool entries
 	for i := uint16(1); i <= classFile.ConstantPoolCount-1; i++ {
 		ent := readCpEntry(reader)
-		fmt.Printf("%v: %v\n", i, ent.Display())
 		classFile.ConstantPool = append(classFile.ConstantPool, ent)
 		// Check to see if the entry is one of the 8-byte varieties
 		// If so, we skip a slot

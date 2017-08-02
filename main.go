@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/a10y/classy/classfile"
 	"github.com/fatih/color"
@@ -72,7 +73,10 @@ func printMethods(cf *classfile.ClassFile) {
 		if i == int(cf.MethodsCount)-1 {
 			branch = "└──"
 		}
-		fmt.Printf("  %v %v%v\n", branch, meth.Name(cf.ConstantPool), meth.Descriptor(cf.ConstantPool))
+		name := meth.Name(cf.ConstantPool)
+		params, ret := classfile.ParseMethodDescriptor(meth.Descriptor(cf.ConstantPool))
+		repr := fmt.Sprintf("%v %v(%v)\n", ret, name, strings.Join(params, ", "))
+		fmt.Printf("  %v %v", branch, repr)
 	}
 }
 
@@ -82,7 +86,7 @@ func printFields(cf *classfile.ClassFile) {
 		if i == int(cf.FieldsCount)-1 {
 			branch = "└──"
 		}
-		desc := classfile.ParseDescriptor(field.Descriptor(cf.ConstantPool))
+		desc := classfile.ParseFieldDescriptor(field.Descriptor(cf.ConstantPool))
 		fmt.Printf("  %v %v %v\n", branch, desc, field.Name(cf.ConstantPool))
 	}
 }
