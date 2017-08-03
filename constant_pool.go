@@ -33,89 +33,87 @@ type CONSTANT_Class_info struct {
 	NameIndex uint16
 }
 
-// Constant pool entry for field references.
-// Corresponds to eponymous struct in the spec.
+// CONSTNAT_Fieldref_info corresponds to eponymous struct in the spec.
 type CONSTANT_Fieldref_info struct {
 	Tag              ConstantTag
 	ClassIndex       uint16
 	NameAndTypeIndex uint16
 }
 
-// Constant pool entry referencing a method.
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_Methodref_info corresponds to the eponymous struct in the spec.
 type CONSTANT_Methodref_info struct {
 	Tag              ConstantTag
 	ClassIndex       uint16
 	NameAndTypeIndex uint16
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_InterfaceMethodref_info corresponds to eponymous struct in the spec.
 type CONSTANT_InterfaceMethodref_info struct {
 	Tag              ConstantTag
 	ClassIndex       uint16
 	NameAndTypeIndex uint16
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_String_info corresponds to eponymous struct in the spec.
 type CONSTANT_String_info struct {
 	Tag         ConstantTag
 	StringIndex uint16
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_Integer_info corresponds to eponymous struct in the spec.
 type CONSTANT_Integer_info struct {
 	Tag   ConstantTag
 	Value uint32
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_Float_info corresponds to eponymous struct in the spec.
 type CONSTANT_Float_info struct {
 	Tag   ConstantTag
 	Value float32
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_Long_info corresponds to eponymous struct in the spec.
 type CONSTANT_Long_info struct {
 	Tag       ConstantTag
 	HighBytes uint32
 	LowBytes  uint32
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_Double_info corresponds to eponymous struct in the spec.
 type CONSTANT_Double_info struct {
 	Tag       ConstantTag
 	HighBytes uint32
 	LowBytes  uint32
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_NameAndType_info corresponds to eponymous struct in the spec.
 type CONSTANT_NameAndType_info struct {
 	Tag             ConstantTag
 	NameIndex       uint16
 	DescriptorIndex uint16
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_Utf8_info corresponds to eponymous struct in the spec.
 type CONSTANT_Utf8_info struct {
 	Tag    ConstantTag
 	Length uint16
 	Bytes  []byte
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_MethodHandle_info corresponds to eponymous struct in the spec.
 type CONSTANT_MethodHandle_info struct {
 	Tag            ConstantTag
 	ReferenceKind  byte
 	ReferenceIndex uint16
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_MethodType_info corresponds to eponymous struct in the spec.
 type CONSTANT_MethodType_info struct {
 	Tag             ConstantTag
 	DescriptorIndex uint16
 }
 
-// Corresponds to eponymous struct in the spec.
+// CONSTANT_InvokeDynamic_info corresponds to eponymous struct in the spec.
 type CONSTANT_InvokeDynamic_info struct {
 	Tag                      ConstantTag
 	BootstrapMethodAttrIndex uint16

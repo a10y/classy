@@ -1,20 +1,6 @@
 // Types and functions for parsing JVM Classfiles.
 package classy
 
-// Shortcut for a uint16 that represents an access flag for the class, field, or method
-type Access uint16
-
-const (
-	ACC_PUBLIC     Access = 0x0001
-	ACC_FINAL             = 0x0010
-	ACC_SUPER             = 0x0020
-	ACC_INTERFACE         = 0x0200
-	ACC_ABSTRACT          = 0x0400
-	ACC_SYNTHETIC         = 0x1000
-	ACC_ANNOTATION        = 0x2000
-	ACC_ENUM              = 0x4000
-)
-
 // An in-memory representation of a .class file that is loadable by a JVM.
 // This closely mirrors the actual serialized layout of a classfile and all its nested
 // components, but with some syntactic flourishes to make it cleaner to work with. We are
@@ -27,7 +13,7 @@ type ClassFile struct {
 	MajorVersion      uint16
 	ConstantPoolCount uint16
 	ConstantPool      []CpEntry
-	AccessFlags       uint16
+	AccessFlags       Access
 	ThisClass         uint16
 	SuperClass        uint16
 	InterfacesCount   uint16
@@ -52,7 +38,7 @@ type CpEntry interface {
 
 // Classfile field information
 type FieldInfo struct {
-	AccessFlags     uint16
+	AccessFlags     Access
 	NameIndex       uint16
 	DescriptorIndex uint16
 	AttrsCount      uint16
@@ -68,7 +54,7 @@ type AttrInfo struct {
 
 // Corresponds to the method_info type in the spec.
 type MethodInfo struct {
-	AccessFlags     uint16
+	AccessFlags     Access
 	NameIndex       uint16
 	DescriptorIndex uint16
 	AttrsCount      uint16
