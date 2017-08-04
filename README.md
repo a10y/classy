@@ -84,7 +84,7 @@ ConstantPool: (26 entries)
   ├── 24: CONSTANT_Utf8
   │		"java/lang/Object"
   └── 25: CONSTANT_Utf8
-  │		"connor macleod"
+  		"connor macleod"
 
 Methods: (3 entries)
   ├── public void <init>()
