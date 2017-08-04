@@ -20,20 +20,26 @@ var (
 	ParamTypeColor                = color.New(color.FgRed)
 )
 
+func usage() {
+	fmt.Fprintf(os.Stderr, "Usage: %v FILENAME\n", os.Args[0])
+	os.Exit(-1)
+}
+
 func main() {
+	if len(os.Args) == 1 {
+		usage()
+	}
+
 	data, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
 		panic(err)
 	}
-	classFile := classy.ReadClassFile(data)
-
-	validMsg := SuccessColorizer.Sprint("valid")
-	if classFile.Magic != 0xCAFEBABE {
-		validMsg = ErrorColorizer.Sprintf("INVALID")
+	classFile, err := classy.ReadClassFile(data)
+	if classFile == nil {
+		fmt.Fprintf(os.Stderr, "Error parsing %v: %v\n", os.Args[1], err.Error())
+		os.Exit(-1)
 	}
 
-	AuxColorizer.Printf("Magic:")
-	fmt.Printf(" 0x%X (%v)\n", classFile.Magic, validMsg)
 	AuxColorizer.Printf("Major:")
 	fmt.Printf(" %v\n", classFile.MajorVersion)
 	AuxColorizer.Printf("Minor:")
