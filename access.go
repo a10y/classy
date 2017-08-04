@@ -4,28 +4,45 @@ import (
 	"strings"
 )
 
-// Shortcut for a uint16 that represents an access flag for the class, field, or method
+// Access is a shortcut for a uint16 that represents an access flag for the class, field,
+// or method.
 type Access uint16
 
 const (
-	AccPublic    Access = 0x0001
-	AccPrivate          = 0x0002
-	AccProtected        = 0x0004
-	AccStatic           = 0x0008
-	AccFinal            = 0x0010
-	AccSuper            = 0x0020
-	AccVolatile         = 0x0040
+	// AccPublic indicates public access.
+	AccPublic Access = 0x0001
+	// AccPrivate indicates private access.
+	AccPrivate = 0x0002
+	// AccProtected indicates protected access.
+	AccProtected = 0x0004
+	// AccStatic indicates static method or field.
+	AccStatic = 0x0008
+	// AccFinal indicates unoverridable functions or unassignable fields.
+	AccFinal = 0x0010
+	// AccSuper is archaic and (AFAICT) unused in modern JVM's.
+	AccSuper = 0x0020
+	// AccVolatile indicates volatile variables.
+	AccVolatile = 0x0040
 
+	// AccTransient indicates a transient field (i.e. one that is not serialized).
 	AccTransient = 0x0080
-	AccVarargs   = 0x0080
+	// AccVarargs indicates a method takes variable arguments.
+	AccVarargs = 0x0080
 
-	AccNative     = 0x0100
-	AccInterface  = 0x0200
-	AccAbstract   = 0x0400
-	AccStrict     = 0x0800
-	AccSynthetic  = 0x1000
+	// AccNative indicates the method is implemented natively.
+	AccNative = 0x0100
+	// AccInterface indicates the classfile is of an interface, not a class.
+	AccInterface = 0x0200
+	// AccAbstract indicates a method declared abstract.
+	AccAbstract = 0x0400
+	// AccStrict indicates a class, interface or method that uses strictfp.
+	AccStrict = 0x0800
+	// AccSynthetic indicates a field or method that isn't in the source code.
+	AccSynthetic = 0x1000
+	// AccAnnotation indicates an annotation type.
 	AccAnnotation = 0x2000
-	AccEnum       = 0x4000
+	// AccEnum indicates the class is an enum.
+	AccEnum = 0x4000
 )
 
 // MethodFlagsRepr returns the string representation of flags for a method, in the order
