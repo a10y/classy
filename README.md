@@ -31,7 +31,6 @@ public class more {
 When compiled to `more.class`, when run through classy produces the following output (color not preserved)
 
 ```
-Magic: 0xCAFEBABE (valid)
 Major: 52
 Minor: 0
 
