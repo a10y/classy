@@ -1,3 +1,5 @@
+[![GoDoc](https://godoc.org/github.com/a10y/classy?status.svg)](https://godoc.org/github.com/a10y/classy)
+
 # classy: Classfile parsing libray and tool
 
 ## Installing
