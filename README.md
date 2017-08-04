@@ -34,7 +34,7 @@ When compiled to `more.class`, when run through classy produces the following ou
 Major: 52
 Minor: 0
 
-ConstantPool: (26 entries)
+ConstantPool: (25 entries)
   ├── 01: CONSTANT_Methodref
   │
   ├── 02: CONSTANT_Fieldref

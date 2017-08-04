@@ -46,7 +46,7 @@ func main() {
 	fmt.Printf(" %v\n", classFile.MinorVersion)
 
 	HeaderColorizer.Printf("\nConstantPool:")
-	fmt.Printf(" (%v entries)\n", classFile.ConstantPoolCount)
+	fmt.Printf(" (%v entries)\n", classFile.ConstantPoolCount-1)
 	printCP(classFile)
 
 	HeaderColorizer.Printf("\nMethods:")
