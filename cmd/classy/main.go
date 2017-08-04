@@ -69,11 +69,13 @@ func printCP(cf *classy.ClassFile) {
 			continue
 		}
 		branch := "├──"
+		branch2 := "│"
 		if i == int(cf.ConstantPoolCount)-2 {
 			branch = "└──"
+			branch2 = ""
 		}
 		fmt.Printf("  %v %02d: %v\n", branch, i+1, cpEntry.StringTag())
-		fmt.Printf("  │\t\t%v\n", cpEntry.Repr(cf.ConstantPool))
+		fmt.Printf("  %v\t\t%v\n", branch2, cpEntry.Repr(cf.ConstantPool))
 	}
 }
 
