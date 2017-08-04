@@ -5,7 +5,7 @@
 ## Installing
 
 ```
-go get github.com/a10y/classy
+go get -u github.com/a10y/classy/...
 ```
 
 
