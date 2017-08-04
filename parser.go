@@ -24,7 +24,7 @@ func ReadClassFile(raw []byte) (classFile *ClassFile, err error) {
 	safeReadBinary(reader, binary.BigEndian, &classFile.Magic)
 
 	if classFile.Magic != ClassFileMagic {
-		panic(fmt.Errorf("Invalid magic: %v", classFile.Magic))
+		panic(fmt.Errorf("Invalid magic: 0x%X", classFile.Magic))
 	}
 
 	safeReadBinary(reader, binary.BigEndian, &classFile.MinorVersion)
