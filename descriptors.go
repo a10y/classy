@@ -5,10 +5,41 @@ import (
 	"strings"
 )
 
-// Parse descriptor
+// ParseFieldDescriptor returns the type for a field parsed from its UTF-8 text
+// descriptor.
 func ParseFieldDescriptor(descriptor string) string {
 	name, _ := parseFieldDescriptor(descriptor)
 	return name
+}
+
+// ParseMethodDescriptor parses the descriptor string for a method to return the
+// fully qualified parameter and return types.
+func ParseMethodDescriptor(descriptor string) ([]string, string) {
+	var paramTypes []string
+	if descriptor[0] != '(' {
+		panic(fmt.Errorf("Invalid method descriptor '%v'", descriptor))
+	}
+
+	descriptor = descriptor[1:]
+	finished := false
+	for !finished {
+		if len(descriptor) == 0 {
+			panic(fmt.Errorf("this shouldn't happen!!!"))
+		}
+
+		switch descriptor[0] {
+		case ')':
+			descriptor = descriptor[1:]
+			finished = true
+			break
+		default:
+			name, desc := parseFieldDescriptor(descriptor)
+			paramTypes = append(paramTypes, name)
+			descriptor = desc
+		}
+	}
+	retType, _ := parseFieldDescriptor(descriptor)
+	return paramTypes, retType
 }
 
 func parseFieldDescriptor(descriptor string) (string, string) {
@@ -47,32 +78,4 @@ func parseFieldDescriptor(descriptor string) (string, string) {
 	default:
 		panic(fmt.Errorf("Invalid basetype '%v' for descriptor '%v'", descriptor[0], descriptor))
 	}
-}
-
-func ParseMethodDescriptor(descriptor string) ([]string, string) {
-	var paramTypes []string
-	if descriptor[0] != '(' {
-		panic(fmt.Errorf("Invalid method descriptor '%v'", descriptor))
-	}
-
-	descriptor = descriptor[1:]
-	finished := false
-	for !finished {
-		if len(descriptor) == 0 {
-			panic(fmt.Errorf("this shouldn't happen!!!"))
-		}
-
-		switch descriptor[0] {
-		case ')':
-			descriptor = descriptor[1:]
-			finished = true
-			break
-		default:
-			name, desc := parseFieldDescriptor(descriptor)
-			paramTypes = append(paramTypes, name)
-			descriptor = desc
-		}
-	}
-	retType, _ := parseFieldDescriptor(descriptor)
-	return paramTypes, retType
 }
