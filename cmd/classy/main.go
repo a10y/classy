@@ -40,6 +40,9 @@ func main() {
 		os.Exit(-1)
 	}
 
+	AuxColorizer.Printf("Binary Name:")
+	fmt.Printf(" %v\n", classFile.GetBinaryName())
+
 	AuxColorizer.Printf("Major:")
 	fmt.Printf(" %v\n", classFile.MajorVersion)
 	AuxColorizer.Printf("Minor:")

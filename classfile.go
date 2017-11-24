@@ -1,6 +1,10 @@
 // Package classy contains types and functions for parsing JVM Classfiles.
 package classy
 
+import (
+	"strings"
+)
+
 // ClassFile is an in-memory representation of a .class file that is loadable by a JVM.
 // This closely mirrors the actual serialized layout of a classfile and all its nested
 // components, but with some syntactic flourishes to make it cleaner to work with. We are
@@ -60,6 +64,13 @@ type MethodInfo struct {
 	DescriptorIndex uint16
 	AttrsCount      uint16
 	Attrs           []AttrInfo
+}
+
+// Get the binary name of the class stored in the ClassFile.
+// Converts the forward-slashes to dots.
+func (cf *ClassFile) GetBinaryName() string {
+	binaryNameRaw := cf.ConstantPool[cf.ThisClass-1].Repr(cf.ConstantPool)
+	return strings.Replace(binaryNameRaw, "/", ".", -1)
 }
 
 // Name gets the String name of the field, performing a lookup in the provided constant
