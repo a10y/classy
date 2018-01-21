@@ -3,6 +3,7 @@ package classy
 import (
 	"fmt"
 	"math"
+	"strconv"
 )
 
 // ConstantTag is a 1-byte header before every entry in the constant pool conveying type
@@ -187,8 +188,7 @@ func (i *CONSTANT_String_info) RawTag() ConstantTag {
 func (i *CONSTANT_String_info) Repr(cp []CpEntry) string {
 	idx := i.StringIndex - 1
 	ent := cp[idx].(*CONSTANT_Utf8_info)
-	val := string(ent.Bytes[:ent.Length])
-	return fmt.Sprintf("\"%v\"", val)
+	return quoted(ent.Bytes, ent.Length)
 }
 
 func (i *CONSTANT_Integer_info) StringTag() string {
@@ -280,8 +280,7 @@ func (i *CONSTANT_Utf8_info) Value() string {
 }
 
 func (i *CONSTANT_Utf8_info) Repr(ignored []CpEntry) string {
-	// Fill me in
-	return fmt.Sprintf("\"%v\"", i.Value())
+	return quoted(i.Bytes, i.Length)
 }
 
 func (i *CONSTANT_MethodHandle_info) StringTag() string {
@@ -321,4 +320,8 @@ func (i *CONSTANT_InvokeDynamic_info) RawTag() ConstantTag {
 func (i *CONSTANT_InvokeDynamic_info) Repr(ignored []CpEntry) string {
 	// Fill me in
 	return ""
+}
+
+func quoted(original []byte, size uint16) string {
+	return strconv.Quote(string(original[:size]))
 }
